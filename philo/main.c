@@ -12,11 +12,32 @@
 
 #include "philosophers.h"
 
+long int	get_current_time(long int start_time)
+{
+	struct timeval tv;
+
+	gettimeofday(&tv, 0);
+	//printf("start_time: %ld curr_time: %ld\n",start_time, ((tv.tv_sec) * 1000 + (tv.tv_usec) / 1000));
+	return (((tv.tv_sec) * 1000 + (tv.tv_usec) / 1000) - start_time);
+}
+
+int	is_dead(t_philo	*philo)
+{
+	printf("id: %d, ttd: %d, currentTIme: %ld, lastmeal: %ld\n", philo->id, philo->prog->ttd, get_current_time(philo->prog->time), philo->last_meal);
+	if (philo->prog->ttd > (get_current_time(philo->prog->time) - philo->last_meal))
+		return (0);
+	else
+		return (1);
+}
+
 static void	ft_prog_init(int argc, char const **argv, t_prog *prog)
 {
 	int	i;
+	struct timeval tv;
 
 	i = 0;
+	gettimeofday(&tv, 0);
+	prog->time = (tv.tv_sec) * 1000 + (tv.tv_usec) / 1000;
 	prog->num_of_philos = ft_atoi(argv[1]);
 	prog->ttd = ft_atoi(argv[2]);
 	prog->tte = ft_atoi(argv[3]);
@@ -28,56 +49,82 @@ static void	ft_prog_init(int argc, char const **argv, t_prog *prog)
 	prog->philos = (t_philo *)malloc(sizeof(t_philo) * prog->num_of_philos);
 	while (i < prog->num_of_philos)
 	{
-		prog->philos[i].last_meal = prog->time;
-		pthread_mutex_init(&(prog->philos[i].r_fork), 0);
+		prog->philos[i].meal_eated = 0;
+		prog->philos[i].last_meal = get_current_time(prog->time);
+		pthread_mutex_init(&(prog->philos[i].l_fork), 0);
 
 		if (i == prog->num_of_philos - 1)
-			prog->philos[i].l_fork = &prog->philos[0].r_fork;
+			prog->philos[i].r_fork = &prog->philos[0].l_fork;
 		else
-			prog->philos[i].l_fork = &prog->philos[i + 1].r_fork;
+			prog->philos[i].r_fork = &prog->philos[i + 1].l_fork;
 		prog->philos[i].id = i + 1;
 		prog->philos[i].prog = prog;
 		i++;
 	}
 }
 
-// ft_think(t_prog *prog)
-// {
-// 	printf("%d %d is thinking")
-// }
+void	ft_think(t_philo *philo)
+{
+	printf("%ld %d is thinking\n", get_current_time(philo->prog->time), philo->id);
+}
+
+void	ft_eat(t_philo *philo)
+{
+	pthread_mutex_lock(philo->r_fork);
+	printf("%ld %d has taken a fork r\n", get_current_time(philo->prog->time), philo->id);
+	pthread_mutex_lock(&philo->l_fork);
+	printf("%ld %d has taken a fork l\n", get_current_time(philo->prog->time), philo->id);
+	printf("%ld %d is eating\n", get_current_time(philo->prog->time), philo->id);
+	usleep(philo->prog->tte * 1000);
+	philo->last_meal = get_current_time(philo->prog->time);
+	pthread_mutex_unlock(philo->r_fork);
+	pthread_mutex_unlock(&philo->l_fork);
+	philo->meal_eated++;
+}
+
+void	ft_sleep(t_philo *philo)
+{
+	printf("%ld %d is sleeping\n", get_current_time(philo->prog->time), philo->id);
+	usleep(philo->prog->tts * 1000);
+}
+
 
 void	*ft_routine_philo(void *arg)
 {
 	t_philo *philo;
 
 	philo = (t_philo *)arg;
-	// printf("%d\n", philo->prog->ttd);
-	// printf("ok\n");
 	while(1)
 	{
-		// ft_eat(prog);
-		// ft_sleep(prog);
-		// ft_think(prog);
+		if (!(philo->id % 2))
+			usleep(100000);
+		if (!is_dead(philo))
+			ft_think(philo);
+		else
+			break ;
+		if (!is_dead(philo))
+			ft_eat(philo);
+		else
+			break ;
+		if (!is_dead(philo))
+			ft_sleep(philo);
+		else
+			break ;
 	}
-	// if (philo % 2)
-	// 	usleep(100000);
 	return (0);
 }
 
 int main(int argc, char const **argv)
 {
 	t_prog prog;
-	struct timeval tv;
 	int i = 0;
 	
 	if (argc == 5 || argc == 6)
 	{
-		gettimeofday(&tv, 0);
 		ft_prog_init(argc, argv, &prog);
-		prog.time = (tv.tv_sec) * 1000 + (tv.tv_usec) / 1000;
 		while (i < prog.num_of_philos)
 		{
-			printf("id: %d\n", prog.philos[i].id);
+			//printf("id: %d\n", prog.philos[i].id);
 			pthread_create(&(prog.philos[i].thread), 0, &ft_routine_philo, &(prog.philos[i]));
 			i++;
 		}

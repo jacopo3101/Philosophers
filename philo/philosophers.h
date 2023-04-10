@@ -22,11 +22,12 @@
 struct s_prog;
 
 typedef struct	s_philo {
-	long long		last_meal;
-	pthread_mutex_t	*l_fork;
-	pthread_mutex_t	r_fork;
+	long int		last_meal;
+	pthread_mutex_t	*r_fork;
+	pthread_mutex_t	l_fork;
 	pthread_t		thread;
 	int				id;
+	int				meal_eated;
 	struct s_prog	*prog;
 } t_philo;
 
@@ -37,7 +38,7 @@ typedef struct	s_prog {
 	int		tte;
 	int		tts;
 	int		num_of_eat;
-	struct timeval time;
+	long int time;
 } t_prog;
 
 int	ft_atoi(const char *str);
