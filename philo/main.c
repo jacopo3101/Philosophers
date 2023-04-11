@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: javellis <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: javellis <javellis@student.42firenze.it    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/06 10:51:19 by javellis          #+#    #+#             */
-/*   Updated: 2023/04/07 17:23:24 by javellis         ###   ########.fr       */
+/*   Updated: 2023/04/11 18:10:09 by javellis         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,13 +21,44 @@ long int	get_current_time(long int start_time)
 	return (((tv.tv_sec) * 1000 + (tv.tv_usec) / 1000) - start_time);
 }
 
+int ft_check_end(t_philo *philo)
+{
+	int	i;
+	int	count;
+
+	i = 0;
+	count = 0;
+	while (i < philo->prog->num_of_philos)
+	{
+		//printf("mealeated :%d, num of eat: %d\n", philo->meal_eated , philo->prog->num_of_eat);
+		if (philo->meal_eated == philo->prog->num_of_eat)
+			count++;
+		i++;
+	}
+	//printf("count :%d, numofphilos: %d\n", count , philo->prog->num_of_philos);
+	if (is_dead(philo) || count == philo->prog->num_of_philos)
+	{
+	//	printf("ko\n");
+		return (1);
+	}
+	else
+	{
+	//	printf("ok\n");
+		return (0);
+	}
+}
+
 int	is_dead(t_philo	*philo)
 {
-	printf("id: %d, ttd: %d, currentTIme: %ld, lastmeal: %ld\n", philo->id, philo->prog->ttd, get_current_time(philo->prog->time), philo->last_meal);
-	if (philo->prog->ttd > (get_current_time(philo->prog->time) - philo->last_meal))
-		return (0);
-	else
+	//printf("id: %d, ttd: %d, currentTIme: %ld, lastmeal: %ld\n", philo->id, philo->prog->ttd, get_current_time(philo->prog->time), philo->last_meal);
+	if (philo->prog->ttd < (get_current_time(philo->prog->time) - philo->last_meal))
+	{
+		philo->prog->exit_condition = 1;
+		printf("%ld %d died\n", get_current_time(philo->prog->time), philo->id);
 		return (1);
+	}
+	else
+		return (0);
 }
 
 static void	ft_prog_init(int argc, char const **argv, t_prog *prog)
@@ -39,6 +70,7 @@ static void	ft_prog_init(int argc, char const **argv, t_prog *prog)
 	gettimeofday(&tv, 0);
 	prog->time = (tv.tv_sec) * 1000 + (tv.tv_usec) / 1000;
 	prog->num_of_philos = ft_atoi(argv[1]);
+	prog->exit_condition = 0;
 	prog->ttd = ft_atoi(argv[2]);
 	prog->tte = ft_atoi(argv[3]);
 	prog->tts = ft_atoi(argv[4]);
@@ -94,20 +126,23 @@ void	*ft_routine_philo(void *arg)
 	t_philo *philo;
 
 	philo = (t_philo *)arg;
-	while(1)
+	if (!(philo->id % 2) && philo->prog->num_of_philos > 1)
+		usleep(philo->prog->tte * 1000);
+	while(!philo->prog->exit_condition)
 	{
-		if (!(philo->id % 2))
-			usleep(100000);
-		if (!is_dead(philo))
+		if (!ft_check_end(philo) && !philo->prog->exit_condition)
 			ft_think(philo);
 		else
 			break ;
-		if (!is_dead(philo))
+		if (!ft_check_end(philo) && !philo->prog->exit_condition)
 			ft_eat(philo);
 		else
 			break ;
-		if (!is_dead(philo))
+		//printf("sleep exit = %d || ft_end = %d\n",!philo->prog->exit_condition,!ft_check_end(philo));
+		if (!ft_check_end(philo) && !philo->prog->exit_condition)
+		{
 			ft_sleep(philo);
+		}
 		else
 			break ;
 	}
@@ -121,24 +156,32 @@ int main(int argc, char const **argv)
 	
 	if (argc == 5 || argc == 6)
 	{
-		ft_prog_init(argc, argv, &prog);
-		while (i < prog.num_of_philos)
+		if (ft_input_check(argc, (char **)argv))
 		{
-			//printf("id: %d\n", prog.philos[i].id);
-			pthread_create(&(prog.philos[i].thread), 0, &ft_routine_philo, &(prog.philos[i]));
-			i++;
+			ft_prog_init(argc, argv, &prog);
+			if (prog.num_of_philos != 1)
+			{
+				while (i < prog.num_of_philos)
+				{
+					//printf("id: %d\n", prog.philos[i].id);
+					pthread_create(&(prog.philos[i].thread), 0, &ft_routine_philo, &(prog.philos[i]));
+					i++;
+				}
+				i = 0;
+				while (i < prog.num_of_philos)
+				{
+					pthread_join(prog.philos[i].thread, NULL);
+					i++;
+				}
+				usleep(1000);
+			}
 		}
-		i = 0;
-		while (i < prog.num_of_philos)
-		{
-			pthread_join(prog.philos[i].thread, NULL);
-			i++;
-		}
-		usleep(1000);
-		
+		else
+			printf("Error.\n");
+
 	}
 	else
-		printf("Wrong number of argument\n");
+		printf("Wrong argument number!\n");
 	return 0;
 }
 // †

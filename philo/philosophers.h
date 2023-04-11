@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philosophers.h                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: javellis <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: javellis <javellis@student.42firenze.it    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/06 11:04:04 by javellis          #+#    #+#             */
-/*   Updated: 2023/04/07 15:35:20 by javellis         ###   ########.fr       */
+/*   Updated: 2023/04/11 17:10:02 by javellis         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
 # include <sys/time.h>
 # include <pthread.h>
 # include <stdlib.h>
+# include <limits.h>
 
 struct s_prog;
 
@@ -32,15 +33,18 @@ typedef struct	s_philo {
 } t_philo;
 
 typedef struct	s_prog {
-	int		num_of_philos;
-	t_philo	*philos;
-	int		ttd;
-	int		tte;
-	int		tts;
-	int		num_of_eat;
-	long int time;
+	int			num_of_philos;
+	t_philo		*philos;
+	int			ttd;
+	int			tte;
+	int			tts;
+	int			exit_condition;
+	int			num_of_eat;
+	long int	time;
 } t_prog;
 
 int	ft_atoi(const char *str);
-
+int	is_dead(t_philo	*philo);
+int ft_check_end(t_philo *philo);
+int	ft_input_check(int argc, char **argv);
 #endif

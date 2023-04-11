@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: javellis <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: javellis <javellis@student.42firenze.it    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/06 12:00:27 by javellis          #+#    #+#             */
-/*   Updated: 2023/04/06 12:01:22 by javellis         ###   ########.fr       */
+/*   Updated: 2023/04/11 16:48:27 by javellis         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 int	ft_atoi(const char *str)
 {
-	int	ris;
+	long	ris;
 	int	sign;
 
 	if (!str)
@@ -31,6 +31,10 @@ int	ft_atoi(const char *str)
 	{
 		ris = ris * 10 + *str - '0';
 		str++;
-	}	
+	}
+	if (ris > INT_MAX)
+	{
+		return (-1);
+	}
 	return (ris * sign);
 }

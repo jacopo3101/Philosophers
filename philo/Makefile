@@ -2,7 +2,7 @@ GCC		= gcc
 
 CFLAGS	= -g -Wall -Wextra -Werror -pthread
 
-FILES	= main.c utils.c
+FILES	= main.c utils.c input_check.c
 
 NAME	= philo
 
