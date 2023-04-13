@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philosophers.h                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: javellis <javellis@student.42firenze.it    +#+  +:+       +#+        */
+/*   By: javellis <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/06 11:04:04 by javellis          #+#    #+#             */
-/*   Updated: 2023/04/11 17:10:02 by javellis         ###   ########.fr       */
+/*   Updated: 2023/04/13 15:07:30 by javellis         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,18 +33,21 @@ typedef struct	s_philo {
 } t_philo;
 
 typedef struct	s_prog {
-	int			num_of_philos;
-	t_philo		*philos;
-	int			ttd;
-	int			tte;
-	int			tts;
-	int			exit_condition;
-	int			num_of_eat;
-	long int	time;
+	int				death;
+	int				num_of_philos;
+	t_philo			*philos;
+	int				ttd;
+	int				tte;
+	int				tts;
+	int				num_of_eat;
+	long int		time;
+	pthread_t		dthread;
+	pthread_mutex_t	dmutex;
 } t_prog;
 
 int	ft_atoi(const char *str);
-int	is_dead(t_philo	*philo);
+void	*check_death(void*	arg);
 int ft_check_end(t_philo *philo);
 int	ft_input_check(int argc, char **argv);
+int	ft_count_eats(t_prog *prog);
 #endif
