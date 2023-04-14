@@ -6,7 +6,7 @@
 /*   By: javellis <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/06 12:00:27 by javellis          #+#    #+#             */
-/*   Updated: 2023/04/13 16:53:13 by javellis         ###   ########.fr       */
+/*   Updated: 2023/04/14 11:55:19 by javellis         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,4 +37,29 @@ int	ft_atoi(const char *str)
 		return (-1);
 	}
 	return (ris * sign);
+}
+
+
+static void	ft_putchar(char c)
+{
+	write(1, &c, 1);
+}
+
+void	ft_putnbr(long int nb)
+{
+	if (nb < 0)
+	{
+		write(1, "-", 1);
+		nb = nb * -1;
+	}
+	if (nb < 10)
+	{
+		ft_putchar((nb % 10) + 48);
+		return ;
+	}
+	else
+	{	
+		ft_putnbr(nb / 10);
+		ft_putchar((nb % 10) + 48);
+	}	
 }
