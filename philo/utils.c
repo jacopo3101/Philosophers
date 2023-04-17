@@ -6,7 +6,7 @@
 /*   By: javellis <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/06 12:00:27 by javellis          #+#    #+#             */
-/*   Updated: 2023/04/14 11:55:19 by javellis         ###   ########.fr       */
+/*   Updated: 2023/04/17 17:01:37 by javellis         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 int	ft_atoi(const char *str)
 {
 	long	ris;
-	int	sign;
+	int		sign;
 
 	if (!str)
 		return (0);
@@ -39,27 +39,19 @@ int	ft_atoi(const char *str)
 	return (ris * sign);
 }
 
-
-static void	ft_putchar(char c)
+void	ft_free(t_prog prog)
 {
-	write(1, &c, 1);
-}
+	int	i;
 
-void	ft_putnbr(long int nb)
-{
-	if (nb < 0)
+	pthread_mutex_destroy(&prog.dmutex);
+	pthread_mutex_destroy(&prog.pmutex);
+	pthread_mutex_destroy(&prog.eat_mutex);
+	pthread_mutex_destroy(&prog.meal);
+	i = 0;
+	while (i < prog.num_of_philos)
 	{
-		write(1, "-", 1);
-		nb = nb * -1;
+		pthread_mutex_destroy(&prog.philos[i].l_fork);
+		i++;
 	}
-	if (nb < 10)
-	{
-		ft_putchar((nb % 10) + 48);
-		return ;
-	}
-	else
-	{	
-		ft_putnbr(nb / 10);
-		ft_putchar((nb % 10) + 48);
-	}	
+	free(prog.philos);
 }
