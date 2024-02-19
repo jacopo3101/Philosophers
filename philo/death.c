@@ -14,10 +14,8 @@
 
 int	ft_check_end(t_philo *philo)
 {
-	int	i;
 	int	res;
-
-	i = 0;
+	
 	pthread_mutex_lock(&philo->prog->dmutex);
 	if (ft_count_eats(philo->prog) || philo->prog->death >= 1)
 		res = 1;

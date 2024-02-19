@@ -55,7 +55,7 @@ static void	ft_prog_init(int argc, char const **argv, t_prog *prog)
 	if (argc == 6)
 		prog->num_of_eat = ft_atoi(argv[5]);
 	else
-		prog->num_of_eat = -1;
+		prog->num_of_eat = INT_MAX;
 	prog->philos = (t_philo *)malloc(sizeof(t_philo) * prog->num_of_philos);
 	while (++i < prog->num_of_philos)
 		ft_philo_init(prog, i);
